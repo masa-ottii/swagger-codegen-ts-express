@@ -6,8 +6,9 @@ all: $(DSTS)
 $(DSTS): $(SRCS)
 	npm run build
 
-test:
-	node bin/swagger-generator-typescript-koa2.js example/swagger/dist/example/swagger.yaml
+test: $(DSTS)
+	rm -f test.ts
+	DEBUG=debug node bin/swagger-generator-typescript-koa2.js example/swagger/dist/example/swagger.yaml test.ts
 
 clean:
 	rm -rf dist
