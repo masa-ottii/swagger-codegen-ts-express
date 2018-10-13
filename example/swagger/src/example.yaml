@@ -28,6 +28,31 @@ x-tagGroups:
     tags: [ 'miku', 'rin' ]
 paths:
   $ref#paths-methods: "./paths/methods.yaml"
+  /xxx:
+    get:
+      operationId: 'xxx'
+      description: 'xxx'
+      parameters:
+        - in: query
+          required: true
+          name: ppp
+          type: integer
+        - in: query
+          required: true
+          name: override
+          type: integer
+      responses:
+        'default':
+          description: 'default response'
+    parameters:
+      - in: query
+        required: false
+        name: override
+        type: string
+      - in: query
+        required: false
+        name: common
+        type: string
 #parameters:
 #  $ref#defs: "./params"
 definitions:

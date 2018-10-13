@@ -9,3 +9,13 @@
       responses:
         'default':
           description: 'default response'
+    post:
+      summary: 'METHOD POST'
+      operationId: 'method_post'
+      description: |
+        example of http METHOD POST
+      tags:
+        - 'miku'
+      responses:
+        'default':
+          description: 'default response'

@@ -1,0 +1,60 @@
+# compileDocument
+
+Document を compileDocument() できる。
+戻り型は Compiled で、パスを引数に処理された Path を返す関数。
+  export type Compiled = (path: string) => CompiledPath | undefined;
+  export interface CompiledPath {
+    regex: RegExp;
+    path: PathItem;
+    name: string;
+    expected: string[];
+    requestPath?: string;
+  }
+取得するときの path は、basePath を付け足したもの。
+
+CompiledPath.path は定義では swagger の PathItem だが、実際にはいくつか属性が追加されている。
+メソッドで取得する時は以下のようにする:
+   const compiled_path_op = (compiled_path.path as any)[method.toLowerCase()];
+
+## resolvedParameters
+追加の一つは resolvedParameters.
+swagger では parameters は method の下以外にも、path 直下にも書ける:
+```
+  /xxx:
+    parameters:
+      - in: query
+        required: false
+        name: override
+        type: string
+      - in: query
+        required: false
+        name: common
+        type: string
+    get:
+      operationId: xxx
+      description: xxx
+      parameters:
+        - in: query
+          required: true
+          name: ppp
+          type: integer
+        - in: query
+          required: true
+          name: override
+          type: integer
+```
+
+resolvedParameters は、このパス直下の parameters と、メソッド下の parameters をマージしたもの。
+具体的にはメソッド下の定義で上書きされる。
+上の例だと、
+
+  operation.parameters: [
+    {"in":"query","required":true,"name":"ppp","type":"integer"},
+    {"in":"query","required":true,"name":"override","type":"integer"}
+  ]
+  resolvedParameters=[
+    {"in":"query","required":true,"name":"override","type":"integer"},
+    {"in":"query","required":false,"name":"common","type":"string"},
+    {"in":"query","required":true,"name":"ppp","type":"integer"}
+  ]
+配列の順序は parameters -> method で出てきた順。

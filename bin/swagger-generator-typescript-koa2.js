@@ -1,14 +1,21 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
 const swgen = require('../dist');
 
 function main() {
-  const filepath = process.argv[2];
-  if (filepath == null) {
-    console.log('input filepath required');
+  const inpath = process.argv[2];
+  const outpath = process.argv[3];
+  if (inpath == null) {
+    console.log('input filepath is required');
     return;
   }
-  swgen.main(filepath);
+  if (outpath == null) {
+    console.log('output filepath is required');
+    return;
+  }
+
+  swgen.main(inpath, outpath);
 }
 
 main();
