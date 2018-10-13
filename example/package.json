@@ -1,0 +1,32 @@
+{
+  "name": "swagger-generator-typescript-koa2-example",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [
+    "swagger",
+    "swagger-generator",
+    "typescript",
+    "koa2"
+  ],
+  "files": [
+    "dist"
+  ],
+  "author": "Daisuke Kanda <dai1975@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "build": "make -C swagger"
+  },
+  "devDependencies": {
+    "dtsgenerator": "^1.2.0",
+    "redoc-cli": "^0.6.4",
+    "swagger-merger": "^1.4.3",
+    "swagger2": "^1.0.1"
+  }
+}

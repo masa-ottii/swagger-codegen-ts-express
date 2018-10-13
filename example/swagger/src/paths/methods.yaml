@@ -1,0 +1,11 @@
+  /methods:
+    get:
+      summary: 'METHOD GET'
+      operationId: 'method_get'
+      description: |
+        example of http METHOD GET
+      tags:
+        - 'miku'
+      responses:
+        'default':
+          description: 'default response'

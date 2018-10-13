@@ -1,0 +1,34 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: example
+  description: |
+    swagger spec which includes all variations for swagger-codegen-typescript-koa
+  contact:
+    name: Daisuke Kanda
+    email: dai1975@gmail.com
+    url: https://github.com/dai1975
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+basePath: /api-v1
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: 'miku'
+    description: 'Hatsune Miku'
+  - name: 'rin'
+    description: 'Kagamine Rin'
+x-tagGroups:
+  - name: 'Vocaloids'
+    tags: [ 'miku', 'rin' ]
+paths:
+  $ref#paths-methods: "./paths/methods.yaml"
+#parameters:
+#  $ref#defs: "./params"
+definitions:
+  $ref#defs-error: "./definitions/error.yaml"

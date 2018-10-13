@@ -1,0 +1,13 @@
+  ErrorResponse:
+    type: object
+    required:
+      - code
+      - name
+      - message
+    properties:
+      code:
+        type: integer
+      name:
+        type: string
+      message:
+        type: string

@@ -59,3 +59,10 @@ typings/
 
 # next.js build output
 .next
+
+# my files
+,*
+*~
+*-
+.rpt2_cache
+package-lock.json
