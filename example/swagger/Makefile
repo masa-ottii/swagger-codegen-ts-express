@@ -5,8 +5,7 @@ SRCDIR = src
 DSTDIR = dist/$(TARGET)
 TMPDIR = tmp
 
-_SRCS  = $(TARGET).yaml paths/methods.yaml
-SRCS   = $(_SRCS:%=$(SRCDIR)/%)
+SRCS   = $(wildcard $(SRCDIR)/**/*.yaml)
 
 DST_SWAGGER   = $(DSTDIR)/swagger.yaml
 DST_REDOC     = $(DSTDIR)/redoc/index.html
@@ -32,7 +31,7 @@ $(DST_SWAGGER): $(TMPDIR)/$(DST_SWAGGER)
 
 $(TMPDIR)/$(DST_SWAGGER): $(SRCS)
 	@mkdir -p $$(dirname $@)
-	npx swagger-merger -o $@ -i $<
+	npx swagger-merger -o $@ -i $(SRCDIR)/$(TARGET).yaml
 
 $(DST_REDOC): $(DST_SWAGGER)
 	@mkdir -p $$(dirname $@)

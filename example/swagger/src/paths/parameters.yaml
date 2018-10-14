@@ -1,0 +1,141 @@
+  /parameters/query:
+    get:
+      operationId: 'parameters_query'
+      description: 'test of query parameter'
+      parameters:
+        - in: query
+          required: true
+          name: qint
+          type: integer
+      responses:
+        'default':
+          description: 'default response'
+
+  /parameters/types/integer:
+    get:
+      operationId: 'parameters_types_integer'
+      description: 'test of integer type parameter'
+      parameters:
+        - name: integer
+          in: query
+          type: integer
+        - name: i32
+          in: query
+          type: integer
+          format: int32
+        - name: i64
+          in: query
+          type: integer
+          format: int64
+      responses:
+        'default':
+          description: 'default response'
+
+  /parameters/types/number:
+    get:
+      operationId: 'parameters_types_number'
+      description: 'test of number type parameter'
+      parameters:
+        - name: n
+          in: query
+          type: number
+        - name: f
+          in: query
+          type: number
+          format: float
+        - name: d
+          in: query
+          type: number
+          format: double
+      responses:
+        'default':
+          description: 'default response'
+
+  /parameters/types/string:
+    get:
+      operationId: 'parameters_types_string'
+      description: 'test of string type parameter'
+      parameters:
+        - name: s
+          in: query
+          type: string
+        - name: byte
+          in: query
+          type: string
+          format: byte
+        - name: binary
+          in: query
+          type: string
+          format: binary
+        - name: date
+          in: query
+          type: string
+          format: date
+        - name: datetime
+          in: query
+          type: string
+          format: date-time
+        - name: password
+          in: query
+          type: string
+          format: password
+      responses:
+        'default':
+          description: 'default response'
+  /parameters/types/boolean:
+    get:
+      operationId: 'parameters_types_boolean'
+      description: 'test of boolean type parameter'
+      parameters:
+        - name: b
+          in: query
+          type: boolean
+      responses:
+        'default':
+          description: 'default response'
+
+  /parameters_required:
+    get:
+      operationId: 'parameters_required'
+      description: 'test of required field of parameter'
+      parameters:
+        - in: query
+          required: true
+          name: t
+          type: integer
+        - in: query
+          required: false
+          name: f
+          type: integer
+        - in: query
+          name: n
+          type: integer
+      responses:
+        'default':
+          description: 'default response'
+
+  /parameters_override:
+    get:
+      operationId: 'parameters_override'
+      description: 'test of paths.<path>.parameters element'
+      parameters:
+        - in: query
+          required: true
+          name: child
+          type: integer
+        - in: query
+          required: true
+          name: override_to_int_required
+          type: integer
+      responses:
+        'default':
+          description: 'default response'
+    parameters:
+      - in: query
+        required: false
+        name: override_to_int_required
+        type: string
+      - in: query
+        required: false
+        name: parent
+        type: string

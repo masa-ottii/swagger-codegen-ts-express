@@ -28,6 +28,7 @@ x-tagGroups:
     tags: [ 'miku', 'rin' ]
 paths:
   $ref#paths-methods: "./paths/methods.yaml"
+  $ref#paths-parameters: "./paths/parameters.yaml"
 #parameters:
 #  $ref#defs: "./params"
 definitions:
