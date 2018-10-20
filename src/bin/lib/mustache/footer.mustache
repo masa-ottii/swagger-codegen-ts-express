@@ -1,0 +1,28 @@
+//-- footer -----------------------------------------
+export interface Routes {
+  {{#operations}}
+  paths.{{& operationId }}?: paths.{{& operationId }}.Handler;
+  {{/operations}}
+}
+export class Router extends KoaRouter {
+  swagger: Routes = {};
+}
+
+export function setup(app:Koa, swagger_filepath:string, routes_dirpath:string): Router {
+  const document = swagger2.loadDocumentSync(swagger_filepath); //related from dir of which package.json is located
+  if (!swagger2.validateDocument(document)) {
+    throw Error('swagger validation failed');
+  }
+  app.use(validate(document));
+  //const router0 = new KoaRouter();
+  //const router: Router = { swagger: {}, ...router0 };
+  const router = new Router();
+  app.use(router.routes());
+  app.use(router.allowedMethods());
+
+  {{#operations}}
+  paths.{{& operationId }}.route(router);
+  {{/operations}}
+
+  return router;
+}

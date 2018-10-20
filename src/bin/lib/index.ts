@@ -2,8 +2,8 @@ import * as create_debug from 'debug';
 import * as fs from 'fs';
 import * as mustache from 'mustache';
 import * as sw2 from 'swagger2';
-import * as sw2_schema from '../node_modules/swagger2/dist/schema';
-import * as sw2_compiler from '../node_modules/swagger2/dist/compiler';
+import * as sw2_schema from 'swagger2/dist/schema';
+import * as sw2_compiler from 'swagger2/dist/compiler';
 
 interface CompiledOperation extends sw2_schema.Operation {
   resolvedParameters: sw2_schema.Parameter[];
@@ -21,10 +21,13 @@ class Generator {
   doc: sw2_schema.Document;
   compiled: sw2.Compiled;
   out: fs.WriteStream;
+  results:any;
+
   constructor(doc: sw2_schema.Document, out: fs.WriteStream) {
     this.doc = doc;
     this.compiled = sw2.compileDocument(doc);
     this.out = out;
+    this.results = {};
   }
 
   private render(filename:string, data:Object) {
@@ -35,9 +38,11 @@ class Generator {
 
   on_root() {
     debug('on_root');
+    this.results = {};
     this.render('header', {});
 
-    //out.write('path=' + path + "\n");
+    this.render('paths-header', {});
+    this.results.operations = [];
     Object.keys(this.doc.paths).forEach(path => {
       debug('path=' + path);
       const path_item = this.doc.paths[path];
@@ -48,7 +53,8 @@ class Generator {
       }
       this.on_path(path, path_item, cpath!);
     })
-    this.render('footer', {});
+    this.render('paths-footer', {});
+    this.render('footer', {operations: this.results.operations});
   }
   on_path(path: string, item: sw2_schema.PathItem, cpath: sw2_compiler.CompiledPath) {
     debug('on_path: ' + path);
@@ -61,7 +67,7 @@ class Generator {
         }
         this.on_operation(path, method, op, cop! as CompiledOperation);
       }
-    })
+    });
   }
   on_operation(path: string, method: string, op: sw2_schema.Operation, cop: CompiledOperation) {
     //debug('resolved=' + JSON.stringify(cop.resolvedParameters));
@@ -73,6 +79,10 @@ class Generator {
       }
       if (p.in === undefined) {
         throw new Error(`the 'in' field of Parameter is not defined: ${p.name}`);
+      } else if (p.in === 'query') {
+        ret.container = 'query';
+      } else {
+        ret.container = 'params';
       }
       if (p.type === undefined) {
         throw new Error(`the 'type' field of Parameter is not defined: ${p.name}`);
@@ -112,8 +122,10 @@ class Generator {
       } else if (p.type === 'boolean') {
         ret.type = 'boolean';
       }
-      if (ret.decoder === undefined) {
-        ret.decoder = ret.type.toLowerCase();
+      if ((p.in === 'query') || (p.in === 'path')) {
+        if (ret.type !== 'string') {
+          ret.decoder = ret.type.toLowerCase();
+        }
       }
       return {
         name: p.name,
@@ -123,10 +135,16 @@ class Generator {
       };
     });
     this.render('operation', {
-      method: method.toUpperCase(),
+      method: {
+        lower: method.toLowerCase(),
+        upper: method.toUpperCase(),
+      },
       path: path,
-      operationId: cop.operationId,
+      operationId: cop.operationId!,
       parameters
+    });
+    this.results.operations.push({
+      operationId: cop.operationId
     });
   }
 }

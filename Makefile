@@ -1,4 +1,4 @@
-TARGET = dist/index.js
+TARGET = dist/
 DEPS = $(wildcard src/**.ts src/**.mustache)
 TESTFILE = example/swagger/dist/example/swagger.yaml
 
@@ -9,7 +9,7 @@ $(TARGET): $(DEPS)
 
 test: $(TARGET) $(TESTFILE)
 	rm -f test.ts
-	DEBUG=debug node bin/swagger-generator-typescript-koa2.js $(TESTFILE) test.ts
+	DEBUG=debug node dist/bin/swagger-generator-typescript-koa2.js $(TESTFILE) test.ts
 
 $(TESTFILE):
 	$(MAKE) -C example/swagger
