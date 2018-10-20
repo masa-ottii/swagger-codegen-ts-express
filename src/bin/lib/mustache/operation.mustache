@@ -1,27 +1,26 @@
 // ---- {{& method.upper }} {{& path }} -------------------
 export namespace {{& operationId }} {
-  interface Request {
+  export type Request = {
     {{#parameters}}
-    {{& name }}{{^required}}?{{/required}}: {{& type }};
+    {{& name }}{{^required}}?{{/required}}: {{& type_code }};
     {{/parameters}}
   }
   function make_request(ctx: KoaRouter.IRouterContext): Request {
     return {
       {{#parameters}}
       {{& name }}: {{!
-        }}{{#decoder}}{{!
-            }}sctk.decode_{{& decoder }}(ctx.{{& container }}.{{& name }}, {{& def }}){{!
-          }}{{/decoder}}{{!
-          }}{{^decoder}}{{!
-            }}ctx.{{& container }}.{{& name }}{{!
-          }}{{/decoder}},
+        }}sctk.decode_{{& encode }}(ctx.{{& container }}.{{& name }}, {{& schema_code }}),
       {{/parameters}}
     };
   }
-  interface Handler {
-    (req:Request) => Promise<Response>;
+  {{#responses}}
+  export type Response{{& status }} = {};
+  {{/responses}}
+  export type Response = {{& response_types }};
+  export interface Handler {
+    (req:Request): Promise<Response>;
   };
-  function route(router:Router) => {
+  function route(router:Router) {
     router.{{& method.lower }}('{{& path }}', async (ctx_) => {
       const ctx = <any>ctx_;  //KoaRouter.Router.IRouterContext;
       const router = ctx.router as Router;

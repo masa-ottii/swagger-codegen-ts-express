@@ -1,15 +1,70 @@
 import * as create_debug from 'debug';
 import * as fs from 'fs';
+import upperFirst = require('lodash.upperfirst');
 import * as mustache from 'mustache';
 import * as sw2 from 'swagger2';
 import * as sw2_schema from 'swagger2/dist/schema';
 import * as sw2_compiler from 'swagger2/dist/compiler';
 
+const debug = create_debug('debug');
+
 interface CompiledOperation extends sw2_schema.Operation {
   resolvedParameters: sw2_schema.Parameter[];
 }
 
-const debug = create_debug('debug');
+class TypeGenerator {
+  codes: string[];
+  constructor() {
+    this.codes = [];
+  }
+  static walk(def: any): string {
+    const g = new TypeGenerator();
+    g.on_definition(def);
+    return g.codes.join('\n');
+  }
+  on_definition(def: any) {
+    if (def === undefined || def.type === undefined) {
+      this.codes.push('any');
+    } else if (def.type == 'string') {
+      if (def.format === 'date' || def.format === 'date-time') {
+        this.codes.push('Date');
+      } else {
+        this.codes.push('string');
+      }
+    } else if (def.type == 'integer') {
+      if ((def.format === undefined || def.format === 'int64') &&
+          (def.maximum === undefined || Number.MAX_SAFE_INTEGER < def.maximum ||
+           def.minimum === undefined || def.minimum < Number.MIN_SAFE_INTEGER))
+      {
+        this.codes.push('BigNumber');
+      } else {
+        this.codes.push('number');
+      }
+    } else if (def.type == 'number') {
+      this.codes.push('number');
+    } else if (def.type == 'boolean') {
+      this.codes.push('number');
+    } else if (def.type === 'array') {
+      const subtype = TypeGenerator.walk(def.items);
+      this.codes.push(`${subtype}[]`);
+    } else if (def.type === 'object') {
+      if (def.properties === undefined) {
+        this.codes.push('any');
+      } else {
+        const props = def.properties;
+        const subcodes = Object.keys(props).map((k) => {
+          const p = props[k];
+          const required =
+            ((props.required && props.required[k]) || (p.required))? '': '?';
+          const t = TypeGenerator.walk(def.properties[k]);
+          return(`${k}${required}: ${t}`);
+        });
+        this.codes.push("{\n" + subcodes.join('\n') + "\n}");
+      }
+    }
+  }
+}
+
 
 class Generator {
   static METHODS: string[] = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
@@ -69,70 +124,51 @@ class Generator {
       }
     });
   }
+
+  parse_operation_parameter(p:sw2_schema.Parameter, position:string): object {
+    let ret:any = {
+      name: p.name,
+      required: p.required,
+    };
+
+    if (p.name === undefined) {
+      throw new Error(`the 'name' field of Parameter is not defined: ${position}`);
+    }
+
+    if (p.in === undefined) {
+      throw new Error(`the 'in' field of Parameter is not defined: ${p.name}: ${position}`);
+    } else if (p.in === 'query') {
+      Object.assign(ret, { container: 'query',  encode: 'string' });
+    } else if (p.in === 'header' || p.in === 'path') {
+      Object.assign(ret, { container: 'params', encode: 'string' });
+    } else {
+      Object.assign(ret, { container: 'params', encode: 'json' });
+    }
+
+    const schema = p.schema || p;
+    ret.type_code = TypeGenerator.walk(schema);
+    ret.schema_code = JSON.stringify(schema);
+    return ret;
+  }
+  parse_operation_response(status:string, res:sw2_schema.Response, position:string) {
+    return {
+      status: status,
+    };
+  }
   on_operation(path: string, method: string, op: sw2_schema.Operation, cop: CompiledOperation) {
     //debug('resolved=' + JSON.stringify(cop.resolvedParameters));
+
+    const position=`path=${path}, method=${method}`;
     const parameters = cop.resolvedParameters.map((p:sw2_schema.Parameter) => {
-      let ret:any = {};
-      let def:any = Object.assign({}, p);
-      if (p.name === undefined) {
-        throw new Error(`the 'name' field of Parameter is not defined: path=${path}, method=${method}`);
-      }
-      if (p.in === undefined) {
-        throw new Error(`the 'in' field of Parameter is not defined: ${p.name}`);
-      } else if (p.in === 'query') {
-        ret.container = 'query';
-      } else {
-        ret.container = 'params';
-      }
-      if (p.type === undefined) {
-        throw new Error(`the 'type' field of Parameter is not defined: ${p.name}`);
-      } else if (p.type === 'array') {
-        throw new Error(`array is not supported yet`);
-      } else if ((<any>p.type) === 'file') {
-        throw new Error(`file is not supported yet`);
-      } else if (p.type === 'string') {
-        let _ = <any>p;
-        if (p.format === 'byte') {
-          ret.type = 'Buffer';
-          ret.decoder = 'byte';
-        } else if (p.format === 'binary') {
-          ret.type = 'Buffer';
-          ret.decoder = 'binary';
-        } else if (p.format === 'date') {
-          ret.type = 'Date';
-          ret.decoder = 'date';
-        } else if (p.format === 'date-time') {
-          ret.type = 'Date';
-          ret.decoder = 'datetime';
-        } else {
-          ret.type = 'string';
-        }
-      } else if (p.type === 'number') {
-        ret.type = 'number';
-      } else if (p.type === 'integer') {
-        let _ = <any>p;
-        if ((p.format === undefined || p.format === 'int64') &&
-            (_.maximum === undefined || Number.MAX_SAFE_INTEGER < _.maximum ||
-             _.minimum === undefined || _.minimum < Number.MIN_SAFE_INTEGER))
-        {
-          ret.type = 'BigNumber';
-        } else {
-          ret.type = 'number';
-        }
-      } else if (p.type === 'boolean') {
-        ret.type = 'boolean';
-      }
-      if ((p.in === 'query') || (p.in === 'path')) {
-        if (ret.type !== 'string') {
-          ret.decoder = ret.type.toLowerCase();
-        }
-      }
-      return {
-        name: p.name,
-        required: p.required,
-        def: JSON.stringify(def),
-        ...ret,
-      };
+      return this.parse_operation_parameter(p, position);
+    });
+    const responses = Object.keys(op.responses).map((status:string) => {
+      const res = op.responses[status];
+      return this.parse_operation_response(status, res, position);
+    });
+    const response_types = responses.map((d:any) => {
+      const s = upperFirst(d.status);
+      return `Response${s}`;
     });
     this.render('operation', {
       method: {
@@ -141,7 +177,9 @@ class Generator {
       },
       path: path,
       operationId: cop.operationId!,
-      parameters
+      parameters,
+      responses,
+      response_types: response_types.join(' | '),
     });
     this.results.operations.push({
       operationId: cop.operationId

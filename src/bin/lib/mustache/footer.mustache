@@ -1,7 +1,7 @@
 //-- footer -----------------------------------------
 export interface Routes {
   {{#operations}}
-  paths.{{& operationId }}?: paths.{{& operationId }}.Handler;
+  {{& operationId }}?: paths.{{& operationId }}.Handler;
   {{/operations}}
 }
 export class Router extends KoaRouter {
