@@ -9,14 +9,17 @@ export namespace {{& operationId }} {
     return {
       {{#parameters}}
       {{& name }}: {{!
-        }}sctk.decode_{{& encode }}(ctx.{{& container }}.{{& name }}, {{& schema_code }}),
+        }}sctk.decode_{{&encode}}_{{&decode}}(ctx.{{& container }}.{{& name }}, {{& schema_code }}),
       {{/parameters}}
     };
   }
   {{#responses}}
   export type Response{{& status.pascalcase }} = {};
   {{/responses}}
-  export type Response = {{& response_types }};
+  export type Response = {
+    status: number;
+    body: {{& response_types }};
+  };
   export interface Handler {
     (req:Request): Promise<Response>;
   };

@@ -14,42 +14,52 @@ interface CompiledOperation extends sw2_schema.Operation {
 
 class TypeGenerator {
   codes: string[];
+  type: string;
   constructor() {
     this.codes = [];
+    this.type = '';
   }
-  static walk(def: any): string {
+  get code():string {
+    if (this.codes.length == 0) {
+      return this.type;
+    } else {
+      return this.codes.join('\n');
+    }
+  }
+  static walk(def: any): TypeGenerator {
     const g = new TypeGenerator();
     g.on_definition(def);
-    return g.codes.join('\n');
+    return g;
   }
   on_definition(def: any) {
     if (def === undefined || def.type === undefined) {
-      this.codes.push('any');
+      this.type = 'any';
     } else if (def.type == 'string') {
       if (def.format === 'date' || def.format === 'date-time') {
-        this.codes.push('Date');
+        this.type = 'Date';
       } else {
-        this.codes.push('string');
+        this.type = 'string';
       }
     } else if (def.type == 'integer') {
       if ((def.format === undefined || def.format === 'int64') &&
           (def.maximum === undefined || Number.MAX_SAFE_INTEGER < def.maximum ||
            def.minimum === undefined || def.minimum < Number.MIN_SAFE_INTEGER))
       {
-        this.codes.push('BigNumber');
+        this.type = 'BigNumber';
       } else {
-        this.codes.push('number');
+        this.type = 'number';
       }
     } else if (def.type == 'number') {
-      this.codes.push('number');
+      this.type = 'number';
     } else if (def.type == 'boolean') {
-      this.codes.push('number');
+      this.type = 'number';
     } else if (def.type === 'array') {
       const subtype = TypeGenerator.walk(def.items);
-      this.codes.push(`${subtype}[]`);
+      this.type = `${subtype.code}[]`;
     } else if (def.type === 'object') {
+      this.type = 'object';
       if (def.properties === undefined) {
-        this.codes.push('any');
+        ;
       } else {
         const props = def.properties;
         const subcodes = Object.keys(props).map((k) => {
@@ -57,7 +67,7 @@ class TypeGenerator {
           const required =
             ((props.required && props.required[k]) || (p.required))? '': '?';
           const t = TypeGenerator.walk(def.properties[k]);
-          return(`${k}${required}: ${t}`);
+          return(`${k}${required}: ${t.code}`);
         });
         this.codes.push("{\n" + subcodes.join('\n') + "\n}");
       }
@@ -146,7 +156,9 @@ class Generator {
     }
 
     const schema = p.schema || p;
-    ret.type_code = TypeGenerator.walk(schema);
+    const g = TypeGenerator.walk(schema);
+    ret.decode = g.type;
+    ret.type_code = g.code;
     ret.schema_code = JSON.stringify(schema);
     return ret;
   }

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "es2017",
+    "module":"commonjs",
+    "lib": ["es2017"],
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "swagger-codegen-typescript-koa2": ["../../dist/lib"]
+    }
+  },
+  "include": [
+    "dist"
+  ],
+  "exclude": [
+    "node_modules", "swagger"
+  ]
+}

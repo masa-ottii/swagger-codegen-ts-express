@@ -11,10 +11,11 @@ SRCS   = $(wildcard $(SRCDIR)/**/*.yaml)
 DST_SWAGGER   = $(DSTDIR)/swagger.yaml
 DST_REDOC     = $(DSTDIR)/redoc/index.html
 DST_SPECTACLE = $(DSTDIR)/spectacle/index.html
-DST_TS        = $(DSTDIR)/index.ts
-DST_DTS       = $(DSTDIR)/index.d.ts
+DST_DTS       = $(DSTDIR)/swagger.d.ts
+DST_TS        = $(DSTDIR)/generated.ts
+DST_JS        = $(DSTDIR)/index.js
 
-all: validate redoc dts codegen
+all: validate redoc dts compile
 
 validate: $(DST_SWAGGER)
 
@@ -25,6 +26,8 @@ redoc: $(DST_REDOC)
 spectacle: $(DST_SPECTACLE)
 
 codegen: $(DST_TS) $(DST_DTS)
+
+compile: $(DST_JS)
 
 dts: $(DST_DTS)
 
@@ -37,8 +40,11 @@ $(TMPDIR)/$(DST_SWAGGER): $(SRCS)
 	@mkdir -p $$(dirname $@)
 	npx swagger-merger -o $@ -i $(SRCDIR)/$(TARGET).yaml
 
+$(DST_JS): $(DST_TS) $(DST_DTS)
+	npm run build
+
 $(DST_TS): $(TMPDIR)/$(DST_TS)
-	npx prettier $< > $@
+	node node_modules/prettier/bin-prettier.js $< > $@
 
 $(TMPDIR)/$(DST_TS): $(DST_SWAGGER)
 	$(CODEGEN) $< $@
@@ -55,7 +61,7 @@ $(DST_SPECTACLE): $(DST_SWAGGER)
 
 $(DST_DTS): $(DST_SWAGGER)
 	@mkdir -p $$(dirname $@)
-	npx dtsgenerator -o $@ -n $(TARGET) $<
+	node node_modules/dtsgenerator/bin/dtsgen -o $@ -n $(TARGET) $<
 
 clean:
 	rm -rf $(DSTDIR) $(TMPDIR)
