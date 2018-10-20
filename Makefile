@@ -9,7 +9,7 @@ $(TARGET): $(DEPS)
 
 test: $(TARGET) $(TESTFILE)
 	rm -f test.ts
-	DEBUG=debug node dist/bin/swagger-generator-typescript-koa2.js $(TESTFILE) test.ts
+	DEBUG=debug node dist/bin/swagger-codegen-typescript-koa2.js $(TESTFILE) test.ts
 	npx prettier --write test.ts
 
 $(TESTFILE):

@@ -151,8 +151,12 @@ class Generator {
     return ret;
   }
   parse_operation_response(status:string, res:sw2_schema.Response, position:string) {
+    const pascalcase = upperFirst(status);
     return {
-      status: status,
+      status: {
+        raw: status,
+        pascalcase,
+      }
     };
   }
   on_operation(path: string, method: string, op: sw2_schema.Operation, cop: CompiledOperation) {
@@ -167,8 +171,7 @@ class Generator {
       return this.parse_operation_response(status, res, position);
     });
     const response_types = responses.map((d:any) => {
-      const s = upperFirst(d.status);
-      return `Response${s}`;
+      return `Response${d.status.pascalcase}`;
     });
     this.render('operation', {
       method: {

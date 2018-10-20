@@ -14,7 +14,7 @@ export namespace {{& operationId }} {
     };
   }
   {{#responses}}
-  export type Response{{& status }} = {};
+  export type Response{{& status.pascalcase }} = {};
   {{/responses}}
   export type Response = {{& response_types }};
   export interface Handler {
