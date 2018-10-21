@@ -9,7 +9,7 @@
       responses:
         '200':
           description: '200 returns nothing'
-        'default':
+        '400':
           description: 'default response'
           schema:
             type: object

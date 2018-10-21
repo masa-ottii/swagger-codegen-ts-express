@@ -1,17 +1,21 @@
 import Server from './server';
 import * as api_example from 'swagger-generated/example';
 
+let counter:number = 0;
 const method_get:api_example.method_get.Handler = async (req) => {
   console.log('method_get: ' + JSON.stringify(req));
   let res200: api_example.method_get.Response200|undefined = undefined;
-  let resDef: api_example.method_get.ResponseDefault|undefined = undefined;
+  let res400: api_example.method_get.Response400|undefined = undefined;
 
-  res200 = { };
-  resDef = { };
-  return {
-    status: 200,
-    body: res200,
-  };
+  counter += 1;
+  console.log('counter='+counter);
+  res200 = {};
+  res400 = { s: counter.toString() };
+  if ((counter % 2) == 0) {
+    return { status: 200, body: res200, };
+  } else {
+    return { status: 400, body: res400, };
+  }
 };
 /*
   console.log('get /test/:user_id');

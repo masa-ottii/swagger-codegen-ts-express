@@ -13,63 +13,91 @@ interface CompiledOperation extends sw2_schema.Operation {
 }
 
 class TypeGenerator {
-  codes: string[];
-  type: string;
-  constructor() {
-    this.codes = [];
-    this.type = '';
+  _mode: { internal: boolean };
+  _codes: string[];
+  _schema_type:   string | undefined;
+  _internal_type: string | undefined;
+  _external_type: string | undefined;
+  constructor(mode:any) {
+    this._mode = mode;
+    this._codes = [];
+    this._schema_type   = undefined;
+    this._internal_type = undefined;
+    this._external_type = undefined;
+  }
+  get schema_type(): string {
+    return (this._schema_type === undefined)? 'undefined': this._schema_type;
+  };
+  get internal_type(): string {
+    return (this._internal_type === undefined)? 'undefined': this._internal_type;
+  };
+  get external_type(): string {
+    return (this._external_type === undefined)? this.internal_type: this._external_type;
+  };
+  get type(): string {
+    return (this._mode.internal)? this.internal_type: this.external_type;
   }
   get code():string {
-    if (this.codes.length == 0) {
+    if (this._codes.length == 0) {
       return this.type;
     } else {
-      return this.codes.join('\n');
+      return this._codes.join('\n');
     }
   }
-  static walk(def: any): TypeGenerator {
-    const g = new TypeGenerator();
+  static walk(def: any, mode:any): TypeGenerator {
+    const g = new TypeGenerator(mode);
     g.on_definition(def);
     return g;
   }
   on_definition(def: any) {
     if (def === undefined || def.type === undefined) {
-      this.type = 'any';
+      this._schema_type = undefined;
+      this._internal_type = 'undefined';
     } else if (def.type == 'string') {
+      this._schema_type = def.type;
+      this._external_type = 'string';
       if (def.format === 'date' || def.format === 'date-time') {
-        this.type = 'Date';
+        this._internal_type = 'Date';
       } else {
-        this.type = 'string';
+        this._internal_type = 'string';
       }
     } else if (def.type == 'integer') {
+      this._schema_type = def.type;
+      this._external_type = 'number';
       if ((def.format === undefined || def.format === 'int64') &&
           (def.maximum === undefined || Number.MAX_SAFE_INTEGER < def.maximum ||
            def.minimum === undefined || def.minimum < Number.MIN_SAFE_INTEGER))
       {
-        this.type = 'BigNumber';
+        this._internal_type = 'BigNumber';
       } else {
-        this.type = 'number';
+        this._internal_type = 'number';
       }
     } else if (def.type == 'number') {
-      this.type = 'number';
+      this._schema_type = def.type;
+      this._internal_type = 'number';
     } else if (def.type == 'boolean') {
-      this.type = 'number';
+      this._schema_type = def.type;
+      this._internal_type = 'boolean';
     } else if (def.type === 'array') {
-      const subtype = TypeGenerator.walk(def.items);
-      this.type = `${subtype.code}[]`;
+      const subtype = TypeGenerator.walk(def.items, this._mode);
+      this._schema_type = `array_${subtype.schema_type}`;
+      this._internal_type = `${subtype.code}[]`;
     } else if (def.type === 'object') {
-      this.type = 'object';
       if (def.properties === undefined) {
-        ;
+        this._schema_type = 'undefined';
+        this._internal_type = 'undefined';
       } else {
+        this._schema_type = def.type;
+        this._internal_type = 'object';
         const props = def.properties;
         const subcodes = Object.keys(props).map((k) => {
           const p = props[k];
           const required =
             ((props.required && props.required[k]) || (p.required))? '': '?';
-          const t = TypeGenerator.walk(def.properties[k]);
+          const t = TypeGenerator.walk(def.properties[k], this._mode);
           return(`${k}${required}: ${t.code}`);
         });
-        this.codes.push("{\n" + subcodes.join('\n') + "\n}");
+        this._codes.push("{\n" + subcodes.join('\n') + "\n}");
       }
     }
   }
@@ -145,29 +173,33 @@ class Generator {
       throw new Error(`the 'name' field of Parameter is not defined: ${position}`);
     }
 
+    const schema = p.schema || p;
+    const g = TypeGenerator.walk(schema, {internal:false});
     if (p.in === undefined) {
       throw new Error(`the 'in' field of Parameter is not defined: ${p.name}: ${position}`);
     } else if (p.in === 'query') {
-      Object.assign(ret, { container: 'query',  encode: 'string' });
+      ret.decoder = `decode_string_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
+      ret.container = 'query';
     } else if (p.in === 'header' || p.in === 'path') {
-      Object.assign(ret, { container: 'params', encode: 'string' });
+      ret.decoder = `decode_string_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
+      ret.container = 'params';
     } else {
-      Object.assign(ret, { container: 'params', encode: 'json' });
+      ret.decoder = `decode_json_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
+      ret.container = 'params';
     }
-
-    const schema = p.schema || p;
-    const g = TypeGenerator.walk(schema);
-    ret.decode = g.type;
     ret.type_code = g.code;
     ret.schema_code = JSON.stringify(schema);
     return ret;
   }
   parse_operation_response(status:string, res:sw2_schema.Response, position:string) {
-    const pascalcase = upperFirst(status);
+    const schema = res.schema;
+    const g = TypeGenerator.walk(schema, {internal:false});
     return {
+      type_code: g.code,
+      schema_code: JSON.stringify(schema),
       status: {
         raw: status,
-        pascalcase,
+        pascalcase: upperFirst(status),
       }
     };
   }

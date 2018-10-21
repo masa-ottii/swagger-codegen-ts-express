@@ -9,12 +9,12 @@ export namespace {{& operationId }} {
     return {
       {{#parameters}}
       {{& name }}: {{!
-        }}sctk.decode_{{&encode}}_{{&decode}}(ctx.{{& container }}.{{& name }}, {{& schema_code }}),
+        }}sctk.{{&decoder}}(ctx.{{& container }}.{{& name }}, {{& schema_code }}),
       {{/parameters}}
     };
   }
   {{#responses}}
-  export type Response{{& status.pascalcase }} = {};
+  export type Response{{& status.pascalcase }} = {{& type_code }};
   {{/responses}}
   export type Response = {
     status: number;
