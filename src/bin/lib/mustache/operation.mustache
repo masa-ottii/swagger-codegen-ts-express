@@ -1,4 +1,4 @@
-// ---- {{& method.upper }} {{& path }} -------------------
+// ---- {{& method.upper }} {{& path.raw }} -------------------
 export namespace {{& operationId }} {
   export type Request = {
     {{#parameters}}
@@ -18,13 +18,13 @@ export namespace {{& operationId }} {
   {{/responses}}
   export type Response = {
     status: number;
-    body: {{& response_types }};
+    body: {{& response_types_join }};
   };
   export interface Handler {
     (req:Request): Promise<Response>;
   };
   export function route(router:Router) {
-    router.{{& method.lower }}('{{& fullpath }}', async (ctx_) => {
+    router.{{& method.lower }}('{{&path.basePath}}{{&path.koaPath}}', async (ctx_) => {
       const ctx = <any>ctx_;  //KoaRouter.Router.IRouterContext;
       const router = ctx.router as Router;
       if (router.swagger.{{& operationId }}) {

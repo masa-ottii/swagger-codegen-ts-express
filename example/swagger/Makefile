@@ -12,6 +12,9 @@ SRCDIR = src
 DSTDIR = dist
 TMPDIR = tmp
 
+$(TARGETS):
+	$(MAKE) all-$@
+
 all redoc spectacle:
 	@for t in $(TARGETS); do $(MAKE) $@-$$t; done
 
@@ -35,22 +38,21 @@ $(TARGETS:%=spectacle-%):
 	@t=$$(echo $@ | cut -d- -f 2); $(MAKE) $(DSTDIR)/$$t/spectacle/index.html
 
 $(DSTDIR)/%/ts/swagger.d.ts: $(DSTDIR)/%/swagger.yaml
-	t=$$(basename `dirname $@`); \
-	$(DTSGEN) -o $@ -n $$t $<
+	t=$$(basename $$(dirname $$(dirname $@))); \
+	$(DTSGEN) -o $@ -n "" $<
 
-#$(DSTDIR)/%/js/swagger.d.ts: $(DSTDIR)/%/ts/swagger.d.ts
-#	@mkdir -p $$(dirname $@)
-#	cp $< $@
+$(DSTDIR)/%/js/swagger.d.ts: $(DSTDIR)/%/ts/swagger.d.ts
+	@mkdir -p $$(dirname $@)
+	cp $< $@
 
-
-$(DSTDIR)/%/js/index.js: $(DSTDIR)/%/ts/tsconfig.json $(DSTDIR)/%/ts/index.ts $(DSTDIR)/%/ts/swagger.d.ts
+$(DSTDIR)/%/js/index.js: $(DSTDIR)/%/ts/tsconfig.json $(DSTDIR)/%/ts/index.ts $(DSTDIR)/%/js/swagger.d.ts
 	@mkdir -p $$(dirname $@)
 	$(TSC) -p $<
 
 $(DSTDIR)/%/ts/index.ts: $(DSTDIR)/%/ts/swagger.d.ts $(DSTDIR)/%/ts/index.d.ts $(DSTDIR)/%/ts/codegen.ts
 	@t=$$(basename `dirname $@`); \
 	rm -f $@; touch $@; \
-	echo "//export * from './swagger.d'" >> $@ ;\
+	echo "export * from './swagger'" >> $@ ;\
 	echo "export * from './codegen'" >> $@ ;\
 
 $(DSTDIR)/%/ts/index.d.ts: $(DSTDIR)/%/ts/swagger.d.ts $(DSTDIR)/%/ts/codegen.ts
@@ -93,7 +95,7 @@ $(DSTDIR)/%/spectacle/index.html: $(DSTDIR)/%/swagger.yaml
 clean:
 	rm -rf $(DSTDIR) $(TMPDIR)
 
-.PHONY: all clean \
+.PHONY: all clean $(TARGETS) \
   $(TARGETS:%=all-%) \
   $(TARGETS:%=js-%) \
   $(TARGETS:%=ts-%) \

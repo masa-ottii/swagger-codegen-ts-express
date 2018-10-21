@@ -11,6 +11,7 @@
     "build": "tsc"
   },
   "devDependencies": {
+    "dtsgen": "0.0.5",
     "dtsgenerator": "^1.2.0",
     "prettier": "^1.14.3",
     "redoc-cli": "^0.6.4",

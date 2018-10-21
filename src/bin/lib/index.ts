@@ -6,14 +6,17 @@ import * as sw2 from 'swagger2';
 import * as sw2_schema from 'swagger2/dist/schema';
 import * as sw2_compiler from 'swagger2/dist/compiler';
 
-const debug = create_debug('debug');
+const debug = create_debug('codegen');
 
 interface CompiledOperation extends sw2_schema.Operation {
   resolvedParameters: sw2_schema.Parameter[];
 }
 
 class TypeGenerator {
-  _mode: { internal: boolean };
+  _mode: {
+    internal: boolean,
+    swagger_dts_ns: string,
+  };
   _codes: string[];
   _schema_type:   string | undefined;
   _internal_type: string | undefined;
@@ -50,7 +53,21 @@ class TypeGenerator {
     return g;
   }
   on_definition(def: any) {
-    if (def === undefined || def.type === undefined) {
+    if (def === undefined) {
+      this._schema_type = undefined;
+      this._internal_type = 'undefined';
+      return;
+    }
+    if (def.$ref !== undefined) {
+      const a = /^#\/(definitions|parameters)\/([a-zA-Z0-9_]+)$/.exec(def.$ref);
+      if (a !== null && a.length === 3) {
+        this._schema_type   = this._mode.swagger_dts_ns + '.' + a[2];
+        this._internal_type = this._mode.swagger_dts_ns + '.' + a[2];
+        return;
+      }
+    }
+
+    if (def.type === undefined) {
       this._schema_type = undefined;
       this._internal_type = 'undefined';
     } else if (def.type == 'string') {
@@ -106,6 +123,7 @@ class TypeGenerator {
 
 class Generator {
   static METHODS: string[] = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
+  static SWAGGER_DTS_NS = 'd';
 
   static generate(doc: sw2_schema.Document, out: fs.WriteStream) {
     const g = new Generator(doc, out);
@@ -132,7 +150,9 @@ class Generator {
   on_root() {
     debug('on_root');
     this.results = {};
-    this.render('header', {});
+    this.render('header', {
+      swagger_dts_ns: Generator.SWAGGER_DTS_NS,
+    });
 
     this.render('paths-header', {});
     this.results.operations = [];
@@ -174,7 +194,7 @@ class Generator {
     }
 
     const schema = p.schema || p;
-    const g = TypeGenerator.walk(schema, {internal:false});
+    const g = TypeGenerator.walk(schema, {internal:false, swagger_dts_ns:Generator.SWAGGER_DTS_NS});
     if (p.in === undefined) {
       throw new Error(`the 'in' field of Parameter is not defined: ${p.name}: ${position}`);
     } else if (p.in === 'query') {
@@ -193,7 +213,7 @@ class Generator {
   }
   parse_operation_response(status:string, res:sw2_schema.Response, position:string) {
     const schema = res.schema;
-    const g = TypeGenerator.walk(schema, {internal:false});
+    const g = TypeGenerator.walk(schema, {internal:false, swagger_dts_ns:Generator.SWAGGER_DTS_NS});
     return {
       type_code: g.code,
       schema_code: JSON.stringify(schema),
@@ -205,31 +225,31 @@ class Generator {
   }
   on_operation(path: string, method: string, op: sw2_schema.Operation, cop: CompiledOperation) {
     //debug('resolved=' + JSON.stringify(cop.resolvedParameters));
-
-    const position=`path=${path}, method=${method}`;
-    const parameters = cop.resolvedParameters.map((p:sw2_schema.Parameter) => {
-      return this.parse_operation_parameter(p, position);
-    });
-    const responses = Object.keys(op.responses).map((status:string) => {
-      const res = op.responses[status];
-      return this.parse_operation_response(status, res, position);
-    });
-    const response_types = responses.map((d:any) => {
-      return `Response${d.status.pascalcase}`;
-    });
-    const fullpath = (this.doc.basePath)? this.doc.basePath + path: path;
-    this.render('operation', {
+    let render_opts:any = {
       method: {
         lower: method.toLowerCase(),
         upper: method.toUpperCase(),
       },
-      path: path,
-      fullpath: fullpath,
+      path: {
+        raw: path,
+        basePath: this.doc.basePath,
+        koaPath: path.replace(/\{([a-zA-Z0-9_]+)\}/g, ':$1'),
+      },
       operationId: cop.operationId!,
-      parameters,
-      responses,
-      response_types: response_types.join(' | '),
+    };
+
+    const position=`path=${path}, method=${method}`;
+    render_opts.parameters = cop.resolvedParameters.map((p:sw2_schema.Parameter) => {
+      return this.parse_operation_parameter(p, position);
     });
+    render_opts.responses = Object.keys(op.responses).map((status:string) => {
+      const res = op.responses[status];
+      return this.parse_operation_response(status, res, position);
+    });
+    render_opts.response_types_join = render_opts.responses.map((d:any) => {
+      return `Response${d.status.pascalcase}`;
+    }).join(' | ');
+    this.render('operation', render_opts);
     this.results.operations.push({
       operationId: cop.operationId
     });
