@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
   "bin": {
     "swagger-codegen-typescript-koa2": "dist/bin/swagger-codegen-typescript-koa2.js"
   },

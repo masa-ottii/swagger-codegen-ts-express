@@ -185,12 +185,14 @@ class Generator {
     const response_types = responses.map((d:any) => {
       return `Response${d.status.pascalcase}`;
     });
+    const fullpath = (this.doc.basePath)? this.doc.basePath + path: path;
     this.render('operation', {
       method: {
         lower: method.toLowerCase(),
         upper: method.toUpperCase(),
       },
       path: path,
+      fullpath: fullpath,
       operationId: cop.operationId!,
       parameters,
       responses,

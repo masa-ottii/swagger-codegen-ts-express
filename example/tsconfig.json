@@ -17,7 +17,8 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "swagger-generated": [ "swagger/dist" ]
+      "swagger-codegen-typescript-koa2": [ "../dist/lib" ],
+      "swagger-generated/*": [ "swagger/dist/*/js" ]
     }
   },
   "include": [

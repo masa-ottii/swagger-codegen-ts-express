@@ -1,7 +1,7 @@
 //-- footer -----------------------------------------
 export interface Routes {
   {{#operations}}
-  {{& operationId }}?: paths.{{& operationId }}.Handler;
+  {{& operationId }}?: {{& operationId }}.Handler;
   {{/operations}}
 }
 export class Router extends KoaRouter {
@@ -21,7 +21,7 @@ export function setup(app:Koa, swagger_filepath:string, routes_dirpath:string): 
   app.use(router.allowedMethods());
 
   {{#operations}}
-  paths.{{& operationId }}.route(router);
+  {{& operationId }}.route(router);
   {{/operations}}
 
   return router;

@@ -5,7 +5,7 @@ export namespace {{& operationId }} {
     {{& name }}{{^required}}?{{/required}}: {{& type_code }};
     {{/parameters}}
   }
-  function make_request(ctx: KoaRouter.IRouterContext): Request {
+  export function make_request(ctx: KoaRouter.IRouterContext): Request {
     return {
       {{#parameters}}
       {{& name }}: {{!
@@ -23,8 +23,8 @@ export namespace {{& operationId }} {
   export interface Handler {
     (req:Request): Promise<Response>;
   };
-  function route(router:Router) {
-    router.{{& method.lower }}('{{& path }}', async (ctx_) => {
+  export function route(router:Router) {
+    router.{{& method.lower }}('{{& fullpath }}', async (ctx_) => {
       const ctx = <any>ctx_;  //KoaRouter.Router.IRouterContext;
       const router = ctx.router as Router;
       if (router.swagger.{{& operationId }}) {

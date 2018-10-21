@@ -1,69 +1,117 @@
-TARGET = example
+TARGETS = example simple
 VALIDATOR = ./validate.js
 CODEGEN = ../../dist/bin/swagger-codegen-typescript-koa2.js
+SWAGGER_MERGER = node node_modules/swagger-merger/bin/swagger-merger.js
+PRETTIER = node node_modules/prettier/bin-prettier.js
+DTSGEN = node node_modules/dtsgenerator/bin/dtsgen
+REDOC = node node_modules/redoc-cli/index.js
+SPECTACLE = node node_modules/spectacle-docs/bin/spectacle.js
+TSC = npx tsc
 
 SRCDIR = src
-DSTDIR = dist/$(TARGET)
+DSTDIR = dist
 TMPDIR = tmp
 
-SRCS   = $(wildcard $(SRCDIR)/**/*.yaml)
+all redoc spectacle:
+	@for t in $(TARGETS); do $(MAKE) $@-$$t; done
 
-DST_SWAGGER   = $(DSTDIR)/swagger.yaml
-DST_REDOC     = $(DSTDIR)/redoc/index.html
-DST_SPECTACLE = $(DSTDIR)/spectacle/index.html
-DST_DTS       = $(DSTDIR)/swagger.d.ts
-DST_TS        = $(DSTDIR)/generated.ts
-DST_JS        = $(DSTDIR)/index.js
+$(TARGETS:%=all-%):
+	@t=$$(echo $@ | cut -d- -f 2); \
+	for x in js; do $(MAKE) $$x-$$t; done
 
-all: validate redoc dts compile
+$(TARGETS:%=js-%):
+	@t=$$(echo $@ | cut -d- -f 2); $(MAKE) $(DSTDIR)/$$t/js/index.js
 
-validate: $(DST_SWAGGER)
+$(TARGETS:%=ts-%):
+	@t=$$(echo $@ | cut -d- -f 2); $(MAKE) $(DSTDIR)/$$t/ts/codegen.ts
 
-swagger: $(TMPDIR)/$(DST_SWAGGER)
+$(TARGETS:%=swagger-%):
+	@t=$$(echo $@ | cut -d- -f 2); $(MAKE) $(DSTDIR)/$$t/swagger.yaml
 
-redoc: $(DST_REDOC)
+$(TARGETS:%=redoc-%):
+	@t=$$(echo $@ | cut -d- -f 2); $(MAKE) $(DSTDIR)/$$t/redoc/index.html
 
-spectacle: $(DST_SPECTACLE)
+$(TARGETS:%=spectacle-%):
+	@t=$$(echo $@ | cut -d- -f 2); $(MAKE) $(DSTDIR)/$$t/spectacle/index.html
 
-codegen: $(DST_TS) $(DST_DTS)
+$(DSTDIR)/%/ts/swagger.d.ts: $(DSTDIR)/%/swagger.yaml
+	t=$$(basename `dirname $@`); \
+	$(DTSGEN) -o $@ -n $$t $<
 
-compile: $(DST_JS)
+#$(DSTDIR)/%/js/swagger.d.ts: $(DSTDIR)/%/ts/swagger.d.ts
+#	@mkdir -p $$(dirname $@)
+#	cp $< $@
 
-dts: $(DST_DTS)
 
-$(DST_SWAGGER): $(TMPDIR)/$(DST_SWAGGER)
+$(DSTDIR)/%/js/index.js: $(DSTDIR)/%/ts/tsconfig.json $(DSTDIR)/%/ts/index.ts $(DSTDIR)/%/ts/swagger.d.ts
+	@mkdir -p $$(dirname $@)
+	$(TSC) -p $<
+
+$(DSTDIR)/%/ts/index.ts: $(DSTDIR)/%/ts/swagger.d.ts $(DSTDIR)/%/ts/index.d.ts $(DSTDIR)/%/ts/codegen.ts
+	@t=$$(basename `dirname $@`); \
+	rm -f $@; touch $@; \
+	echo "//export * from './swagger.d'" >> $@ ;\
+	echo "export * from './codegen'" >> $@ ;\
+
+$(DSTDIR)/%/ts/index.d.ts: $(DSTDIR)/%/ts/swagger.d.ts $(DSTDIR)/%/ts/codegen.ts
+	@t=$$(basename `dirname $@`); \
+	rm -f $@; touch $@; \
+	echo "export * from './swagger'" >> $@ ;\
+	echo "export * from './codegen'" >> $@ ;\
+
+$(DSTDIR)/%/ts/tsconfig.json: tsconfig-tmpl.json
+	@mkdir -p $$(dirname $@)
+	cp $< $@
+
+$(DSTDIR)/%/ts/codegen.ts: $(TMPDIR)/%.ts
+	@mkdir -p $$(dirname $@)
+	$(PRETTIER) $< > $@
+
+$(TMPDIR)/%.ts: $(DSTDIR)/%/swagger.yaml
+	@mkdir -p $$(dirname $@)
+	$(CODEGEN) $< $@
+
+$(DSTDIR)/%/swagger.yaml: $(TMPDIR)/%.yaml
 	$(VALIDATOR) $<
 	@mkdir -p $$(dirname $@)
 	cp $< $@
 
-$(TMPDIR)/$(DST_SWAGGER): $(SRCS)
+$(TMPDIR)/%.yaml: $(SRCDIR)/%.yaml
 	@mkdir -p $$(dirname $@)
-	npx swagger-merger -o $@ -i $(SRCDIR)/$(TARGET).yaml
+	$(SWAGGER_MERGER) -o $@ -i $<
 
-$(DST_JS): $(DST_TS) $(DST_DTS)
-	npm run build
-
-$(DST_TS): $(TMPDIR)/$(DST_TS)
-	node node_modules/prettier/bin-prettier.js $< > $@
-
-$(TMPDIR)/$(DST_TS): $(DST_SWAGGER)
-	$(CODEGEN) $< $@
-
-$(DST_REDOC): $(DST_SWAGGER)
+$(DSTDIR)/%/redoc/index.html: $(DSTDIR)/%/swagger.yaml
 	@mkdir -p $$(dirname $@)
-	npx redoc-cli \
+	$(REDOC) \
 	  bundle --options.pathInMiddlePanel --options.theme.breakpoints.medium=50rem \
 	  -o $@ $<
 
-$(DST_SPECTACLE): $(DST_SWAGGER)
+$(DSTDIR)/%/spectacle/index.html: $(DSTDIR)/%/swagger.yaml
 	@mkdir -p $$(dirname $@)
-	npx spectacle -t $$(dirname $(DST_SPECTACLE)) $<
-
-$(DST_DTS): $(DST_SWAGGER)
-	@mkdir -p $$(dirname $@)
-	node node_modules/dtsgenerator/bin/dtsgen -o $@ -n $(TARGET) $<
+	$(SPECTACLE) -t $$(dirname $@) $<
 
 clean:
 	rm -rf $(DSTDIR) $(TMPDIR)
 
-.PHONY: all validate swagger redoc spectacle dts
+.PHONY: all clean \
+  $(TARGETS:%=all-%) \
+  $(TARGETS:%=js-%) \
+  $(TARGETS:%=ts-%) \
+  $(TARGETS:%=swagger-%) \
+  $(TARGETS:%=redoc-%) \
+  $(TARGETS:%=spectacle-%) \
+
+PRECIOUS: \
+  $(TARGETS:%=$(TMPDIR)/%.yaml) \
+  $(TARGETS:%=$(TMPDIR)/%.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/swagger.yaml) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/index.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/swagger.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/codegen.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/swagger.d.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/tsconfig.json) \
+  $(TARGETS:%=$(DSTDIR)/%/js/index.js) \
+  $(TARGETS:%=$(DSTDIR)/%/js/codegen.js) \
+  $(TARGETS:%=$(DSTDIR)/%/js/index.d.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/js/codegen.d.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/js/swagger.d.ts) \

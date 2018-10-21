@@ -1,13 +1,17 @@
 import Server from './server';
-//import * as api_example from 'swagger-generated/example';
-import * as api_example from '../swagger/dist/example';
+import * as api_example from 'swagger-generated/example';
 
-const method_get = api_example.paths.method_get.Handler = (req) => {
+const method_get:api_example.method_get.Handler = async (req) => {
   console.log('method_get: ' + JSON.stringify(req));
-  let res: api_example.paths.method_get.ResponseDefault|undefined = undefined;
+  let res200: api_example.method_get.Response200|undefined = undefined;
+  let resDef: api_example.method_get.ResponseDefault|undefined = undefined;
 
-  res = { };
-  return res;
+  res200 = { };
+  resDef = { };
+  return {
+    status: 200,
+    body: res200,
+  };
 };
 /*
   console.log('get /test/:user_id');
