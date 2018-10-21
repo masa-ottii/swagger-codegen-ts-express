@@ -141,7 +141,7 @@ const get_user:api_simple.get_user.Handler = async (req) => {
 
 And setup and run app:
 
-```
+```TypeScript
 const server = new Server();
 const router = api_simple.setup(server.app, './swagger/dist/simple/swagger.yaml', '');
 
