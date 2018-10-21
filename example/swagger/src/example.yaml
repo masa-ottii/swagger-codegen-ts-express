@@ -11,7 +11,7 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-basePath: /api-v1
+basePath: /example-v1
 schemes:
   - http
 consumes:

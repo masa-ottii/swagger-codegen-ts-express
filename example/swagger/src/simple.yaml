@@ -1,0 +1,95 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: simple swagger
+  description: |
+    simple swagger file
+  contact:
+    name: Daisuke Kanda
+    email: dai1975@gmail.com
+    url: https://github.com/dai1975
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+basePath: /simple-v1
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /users/{user_id}:
+    get:
+      summary: 'get user'
+      operationId: 'get_user'
+      description: |
+        get user
+      parameters:
+        - in: path
+          required: true
+          name: user_id
+          type: integer
+          description: user_id
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              body:
+                $ref: '#/definitions/User'
+        'default':
+          description: ERR
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  /users:
+    post:
+      summary: 'post user'
+      operationId: 'post_users'
+      description: |
+        post user
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              body:
+                $ref: '#/definitions/User'
+        'default':
+          description: ERR
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+definitions:
+  User:
+    type: object
+    properties:
+      user_id:
+        type: integer
+      name:
+        type: string
+  ErrorResponse:
+    type: object
+    required:
+      - code
+      - name
+      - message
+    properties:
+      code:
+        type: integer
+      name:
+        type: string
+      message:
+        type: string
+
+  $ref#defs-error: "./definitions/error.yaml"

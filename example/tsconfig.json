@@ -14,13 +14,18 @@
     "outDir": "dist",
     "typeRoots": [
       "node_modules/@types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "swagger-codegen-typescript-koa2": [ "../dist/lib" ],
+      "swagger-generated/*": [ "swagger/dist/*/js" ]
+    }
   },
   "include": [
-    "src/bin",
-    "src/lib",
+    "src",
+    "swagger/dist"
   ],
   "exclude": [
-    "node_modules", "dist", "example"
+    "node_modules", "dist"
   ]
 }

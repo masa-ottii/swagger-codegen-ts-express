@@ -93,6 +93,23 @@
       responses:
         'default':
           description: 'default response'
+  /parameters/types/object:
+    post:
+      operationId: 'parameters_types_object'
+      description: 'test of object type parameter'
+      parameters:
+        - name: obj
+          in: body #the object type muse be with in:body parameter and has schema
+          schema:
+            type: object
+            properties:
+              foo:
+                type: string
+              bar:
+                type: integer
+      responses:
+        'default':
+          description: 'default response'
 
   /parameters_required:
     get:

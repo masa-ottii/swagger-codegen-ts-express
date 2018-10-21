@@ -10,17 +10,11 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "declarationDir": "dist",
-    "outDir": "dist",
-    "typeRoots": [
-      "node_modules/@types"
-    ]
-  },
-  "include": [
-    "src/bin",
-    "src/lib",
-  ],
-  "exclude": [
-    "node_modules", "dist", "example"
-  ]
+    "declarationDir": "../js",
+    "outDir": "../js",
+    "baseUrl": ".",
+    "paths": {
+      "swagger-codegen-typescript-koa2": ["../../../../../dist/lib"]
+    }
+  }
 }

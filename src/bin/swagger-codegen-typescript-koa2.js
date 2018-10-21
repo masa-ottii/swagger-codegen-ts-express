@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const swgen = require('../dist');
+const swgen = require('./lib');
 
 function help() {
-  console.log('swagger-generator-typescript-koa2.js <swagger> <output>')
+  console.log('swagger-codegen-typescript-koa2.js <swagger> <output>')
 }
 
 function main() {
