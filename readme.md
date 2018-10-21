@@ -3,7 +3,7 @@ Generate TypeScript Koa2 server skeleton codes from swagger spec.
 
 ## usage
 
-```
+```console
 $ node swagger-codegen-typescript-koa2 <input.swagger.yaml> <output.ts>
 ```
 
@@ -11,7 +11,7 @@ $ node swagger-codegen-typescript-koa2 <input.swagger.yaml> <output.ts>
 
 ### input swagger file
 
-```
+```YAML
 paths:
   '/users/{user_id}':
     get:
@@ -59,7 +59,7 @@ definitions:
 
 ### output .ts file
 
-```
+```TypeScript
 // ---- GET /users/{user_id} -------------------
 export namespace get_user {
   export type Request = {
@@ -116,7 +116,7 @@ export function setup(
 
 You would implements the API such as:
 
-```
+```TypeScript
 import Server from './server';
 import * as api_simple from 'swagger-generated/simple'; //tsconfig.paths
 
@@ -152,7 +152,7 @@ server.start();
 ### call API
 
 returns implemented result:
-```
+```console
 $ curl 'http://localhost:10080/simple-v1/users/20071227'
 {"user_id":20071227,"name":"Kagamine Rin"}
 
@@ -162,7 +162,7 @@ $ curl 'http://localhost:10080/simple-v1/users/1'
 
 type validation failed:
 
-```
+```console
 $ curl 'http://localhost:10080/simple-v1/users/string'
 {"code":"SWAGGER_REQUEST_VALIDATION_FAILED","errors":[{"actual":"string","expected":{"type":"integer"},"where":"path"}]}
 ```
