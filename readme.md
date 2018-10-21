@@ -166,3 +166,6 @@ type validation failed:
 $ curl 'http://localhost:10080/simple-v1/users/string'
 {"code":"SWAGGER_REQUEST_VALIDATION_FAILED","errors":[{"actual":"string","expected":{"type":"integer"},"where":"path"}]}
 ```
+
+### more...
+If you see package.json or other settings, please check https://github.com/dai1975/swagger-codegen/typescript-koa2/tree/master/examle directory.
