@@ -99,7 +99,7 @@
       description: 'test of object type parameter'
       parameters:
         - name: obj
-          in: body #the object type muse be with in:body parameter and has schema
+          in: body #the object type must be with in:body parameter and has schema
           schema:
             type: object
             properties:

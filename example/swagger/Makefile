@@ -12,6 +12,8 @@ SRCDIR = src
 DSTDIR = dist
 TMPDIR = tmp
 
+default: all
+
 $(TARGETS):
 	$(MAKE) all-$@
 

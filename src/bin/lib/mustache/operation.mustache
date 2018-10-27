@@ -7,10 +7,15 @@ export namespace {{& operationId }} {
   }
   export function make_request(ctx: KoaRouter.IRouterContext): Request {
     return {
-      {{#parameters}}
-      {{& name }}: {{!
-        }}sctk.{{&decoder}}(ctx.{{& container }}.{{& name }}, {{& schema_code }}),
-      {{/parameters}}
+      {{#parameters}}  {{& name }}: {{!
+      }}{{#required}}{{!
+        }}sctk.{{&decoder}}(ctx.{{& container }}!, {{& schema_code }}),{{!
+        }}{{/required}}{{^required}}{{!
+        }}(ctx.{{&container}})?{{!
+                           }}sctk.{{&decoder}}(ctx.{{& container }}!, {{& schema_code }}):{{!
+                           }}undefined,{{!
+        }}{{/required}}{{!
+      }}{{/parameters}}
     };
   }
   {{#responses}}

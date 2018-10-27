@@ -199,13 +199,15 @@ class Generator {
       throw new Error(`the 'in' field of Parameter is not defined: ${p.name}: ${position}`);
     } else if (p.in === 'query') {
       ret.decoder = `decode_string_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
-      ret.container = 'query';
+      ret.container = `query.${p.name}`;
     } else if (p.in === 'header' || p.in === 'path') {
       ret.decoder = `decode_string_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
-      ret.container = 'params';
-    } else {
+      ret.container = `params.${p.name}`;
+    } else if (p.in === 'body') {
       ret.decoder = `decode_json_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
-      ret.container = 'params';
+      ret.container = 'request.body';
+    } else {
+      throw new Error(`the 'in' field of Parameter is unknown: ${p.in}`);
     }
     ret.type_code = g.code;
     ret.schema_code = JSON.stringify(schema);

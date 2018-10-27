@@ -168,4 +168,4 @@ $ curl 'http://localhost:10080/simple-v1/users/string'
 ```
 
 ### more...
-If you see package.json or other settings, please check https://github.com/dai1975/swagger-codegen/typescript-koa2/tree/master/examle directory.
+If you see package.json or other settings, please check https://github.com/dai1975/swagger-codegen-typescript-koa2/tree/master/examle directory.
