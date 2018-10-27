@@ -21,24 +21,30 @@
     "node": ">=6.0.0"
   },
   "scripts": {
-    "build:swagger": "make -C swagger",
-    "build": "tsc",
-    "start": "node -r tsconfig-paths/register dist/src/index.js"
+    "swagger": "make -C swagger",
+    "clean": "rimraf dist tsconfig.json",
+    "setup:internal": "cp tsconfig.internal.json tsconfig.json",
+    "setup:external": "cp tsconfig.external.json tsconfig.json",
+    "compile": "tsc",
+    "start": "node -r tsconfig-paths/register dist/src/index.js",
+    "build:external": "npm-run-all -s clean setup:external compile",
+    "build:internal": "npm-run-all -s clean setup:internal compile",
+    "build": "npm-run-all -s build:external"
   },
   "devDependencies": {
-    "dtsgenerator": "^1.2.0",
-    "redoc-cli": "^0.6.4",
-    "swagger-merger": "^1.4.3",
-    "swagger2": "^1.0.1",
-    "tsconfig-paths": "^3.6.0",
-    "typescript": "^3.1.3"
-  },
-  "dependencies": {
+    "@types/koa": "^2.0.46",
     "@types/koa-bodyparser": "^5.0.1",
     "@types/koa-cors": "0.0.0",
     "@types/koa-router": "^7.0.32",
-    "koa": "^2.5.3",
+    "npm-run-all": "^4.1.3",
+    "rimraf": "^2.6.2"
+  },
+  "dependencies": {
+    "koa": "^2.6.1",
     "koa-bodyparser": "^4.2.1",
-    "koa-cors": "0.0.16"
+    "koa-cors": "0.0.16",
+    "swagger-codegen-typescript-koa2": "^0.1.0",
+    "tsconfig-paths": "^3.6.0",
+    "typescript": "^3.1.3"
   }
 }
