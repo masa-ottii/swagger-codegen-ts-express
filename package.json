@@ -49,7 +49,7 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-    "precommit": "lint-staged"
+    "_precommit": "lint-staged"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": []
