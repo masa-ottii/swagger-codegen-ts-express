@@ -1,8 +1,10 @@
 import * as Koa from 'koa';
 import * as api from 'swagger-generated/simple';
 
-const get_user:api.get_user.Handler = async (req) => {
+const get_user:api.get_user.Handler = async (req, ctx) => {
   console.log('get_user');
+  console.log('  req=' + JSON.stringify(req));
+  console.log('  ctx=' + JSON.stringify(ctx));
   let res200: api.get_user.Response200|undefined = undefined;
   let resDef: api.get_user.ResponseDefault|undefined = undefined;
 

@@ -26,7 +26,7 @@ export namespace {{& operationId }} {
     body: {{& response_types_join }};
   };
   export interface Handler {
-    (req:Request): Promise<Response>;
+    (req:Request, ctx:KoaRouter.IRouterContext): Promise<Response>;
   };
   export function route(router:Router) {
     router.{{& method.lower }}('{{&path.basePath}}{{&path.koaPath}}', async (ctx_) => {
@@ -34,7 +34,7 @@ export namespace {{& operationId }} {
       const router = ctx.router as Router;
       if (router.swagger.{{& operationId }}) {
         const req = make_request(ctx);
-        const res = await router.swagger.{{& operationId }}!(req);
+        const res = await router.swagger.{{& operationId }}!(req, ctx);
         ctx.status = res.status;
         ctx.body   = res.body;
       } else {
