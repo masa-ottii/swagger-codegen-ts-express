@@ -93,9 +93,9 @@
       responses:
         'default':
           description: 'default response'
-  /parameters/types/object:
+  /parameters/types/object_body:
     post:
-      operationId: 'parameters_types_object'
+      operationId: 'parameters_types_object_body'
       description: 'test of object type parameter'
       parameters:
         - name: obj

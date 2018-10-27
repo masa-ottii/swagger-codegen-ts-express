@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const swagger2  = require('swagger2');
-const schema    = require('../node_modules/swagger2/src/schema.json');
+const schema    = require('./node_modules/swagger2/src/schema.json');
 const validator = require('is-my-json-valid');
 
 const validate = validator(schema, {verbose:true});
