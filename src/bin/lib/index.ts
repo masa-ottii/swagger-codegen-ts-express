@@ -101,8 +101,9 @@ class TypeGenerator {
       this._internal_type = `${subtype.code}[]`;
     } else if (def.type === 'object') {
       if (def.properties === undefined) {
-        this._schema_type = 'undefined';
-        this._internal_type = 'undefined';
+        this._schema_type = def.type;
+        this._internal_type = 'object';
+        this._codes.push("{ }");
       } else {
         this._schema_type = def.type;
         this._internal_type = 'object';

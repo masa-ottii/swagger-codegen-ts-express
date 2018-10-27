@@ -46,24 +46,3 @@ export namespace {{& operationId }} {
     });
   }
 }
-/*
-function UserGetTestRequest(ctx: KoaRouter.IRouterContext): UserGetTestRequest {
-  return {
-    user_id: ctx.params.user_id,
-    yell_card_id: ctx.query.yell_card_id,
-    foo: ctx.query.foo,
-  };
-}
-export interface UserGetTestResponse200 {
-  a: string;
-  b: number;
-  c?: string;
-}
-export interface UserGetTestResponse400 {
-  details: string;
-}
-export interface UserGetTestResponse {
-  status: number;
-  body:   UserGetTestResponse200 | UserGetTestResponse400;
-}
-*/

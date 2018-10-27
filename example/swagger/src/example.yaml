@@ -29,7 +29,18 @@ x-tagGroups:
 paths:
   $ref#paths-methods: "./paths/methods.yaml"
   $ref#paths-parameters: "./paths/parameters.yaml"
+  $ref#paths-responses: "./paths/responses.yaml"
 #parameters:
 #  $ref#defs: "./params"
 definitions:
   $ref#defs-error: "./definitions/error.yaml"
+  DefInt:
+    type: integer
+  DefObj:
+    type: object
+    required: [ a ]
+    properties:
+      a:
+        type: integer
+      b:
+        type: string

@@ -1,0 +1,38 @@
+# note:
+#  - responses is required.
+#  - MUST contain at least one respnse code, and it SHOULD be the response for a successful operatin.
+#  - response object may be link to a response defined in respnose section.
+#  - response object:
+#   - description is required.
+#   - in case of schema is not exist, it means no content is returned.
+#   - extend to Schema Object type, response schema may have "file" type of root node.
+#   - response may have "headers" and "examples"
+
+/responses/no-schema:
+  get:
+    operationId: 'responses_no_schema'
+    description: ''
+    responses:
+      200:
+        description: ''
+#
+# swagger spec may allow empty schema, but the swagger2 libs does not.
+#
+#/responses/empty-schema:
+#  get:
+#    operationId: 'responses_empty_schema'
+#    description: ''
+#    responses:
+#      200:
+#        description: ''
+#        schema:
+
+/responses/empty-object:
+  get:
+    operationId: 'responses_empty_object'
+    description: ''
+    responses:
+      200:
+        description: ''
+        schema:
+          type: object
