@@ -1,0 +1,31 @@
+# BUG: request.body は object に定義されているので、プリミティブ期待すると型エラー。
+#  /types/body/integer:
+#    post:
+#      operationId: 'types_body_integer'
+#      description: ''
+#      parameters:
+#        - name: param
+#          in: body
+#          schema:
+#            type: integer
+#      responses:
+#        'default':
+#          description: 'default response'
+
+  /types/body/object:
+    post:
+      operationId: 'types_body_object'
+      description: ''
+      parameters:
+        - name: param
+          in: body
+          schema:
+            type: object
+            properties:
+              foo:
+                type: string
+              bar:
+                type: integer
+      responses:
+        'default':
+          description: 'default response'

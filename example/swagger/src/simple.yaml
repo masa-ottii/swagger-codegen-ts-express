@@ -81,5 +81,3 @@ definitions:
         type: string
       message:
         type: string
-
-  $ref#defs-error: "./definitions/error.yaml"

@@ -1,10 +1,10 @@
 {
-  "name": "swagger-generator-typescript-koa2-example",
+  "name": "swagger-codegen-typescript-koa2-example",
   "version": "0.0.0",
   "description": "",
   "keywords": [
     "swagger",
-    "swagger-generator",
+    "swagger-codegen",
     "typescript",
     "koa2"
   ],

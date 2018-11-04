@@ -31,6 +31,8 @@ paths:
   $ref#paths-parameters: "./paths/parameters.yaml"
   $ref#paths-responses: "./paths/responses.yaml"
   $ref#paths-types-query: "./paths/types-query.yaml"
+  $ref#paths-types-body: "./paths/types-body.yaml"
+  $ref#paths-refs: "./paths/refs.yaml"
 #parameters:
 #  $ref#defs: "./params"
 definitions:

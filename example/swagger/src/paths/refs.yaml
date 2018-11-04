@@ -1,0 +1,48 @@
+  /refs/body/object:
+    post:
+      operationId: 'refs_body_object'
+      description: ''
+      parameters:
+        - in: body
+          required: true
+          name: param
+          schema:
+            $ref: '#/definitions/DefObj'
+      responses:
+        'default':
+          description: 'default response'
+
+# Because refs in parameters is resolved in processing so that this is equals to types_body_integer
+#  /refs/body/int:
+#    post:
+#      operationId: 'refs_body_int'
+#      description: ''
+#      parameters:
+#        - in: body
+#          required: true
+#          name: param
+#          schema:
+#            $ref: '#/definitions/DefInt'
+#      responses:
+#        'default':
+#          description: 'default response'
+
+  /refs/res/object:
+    get:
+      operationId: 'refs_response_object'
+      description: ''
+      responses:
+        '200':
+          description: '200'
+          schema:
+            $ref: '#/definitions/DefObj'
+
+  /refs/res/int:
+    get:
+      operationId: 'refs_response_int'
+      description: ''
+      responses:
+        '200':
+          description: '200'
+          schema:
+            $ref: '#/definitions/DefInt'

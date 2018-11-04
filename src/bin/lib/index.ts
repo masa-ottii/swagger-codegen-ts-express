@@ -144,7 +144,7 @@ class Generator {
 
   constructor(doc: sw2_schema.Document, out: fs.WriteStream) {
     this.doc = doc;
-    this.compiled = sw2.compileDocument(doc);
+    this.compiled = sw2.compileDocument(doc); // which internally calls json-schema-deref-sync
     this.out = out;
     this.results = {};
   }
