@@ -28,7 +28,7 @@ export function decode_json_number_number_external(i:number, schema:any): number
 export function decode_json_boolean_boolean_external(i:boolean, schema:any): boolean {
   return i;
 }
-export function decode_json_object_object_external(i:object, schema:any): object {
+export function decode_json_object_object_external(i:object, schema:any): any {
   return i;
 }
 
@@ -58,7 +58,7 @@ export function decode_string_boolean_boolean_external(s:string, schema:any): bo
   const i = (s === 'true');
   return decode_json_boolean_boolean_external(i, schema);
 }
-export function decode_string_object_object_external(s:string, schema:any): object {
+export function decode_string_object_object_external(s:string, schema:any): any {
   const i = JSON.parse(s);
   return decode_json_object_object_external(i, schema);
 }
@@ -110,6 +110,6 @@ export function decode_string_array_number_number_external(s:string[], schema:an
 export function decode_string_array_boolean_boolean_external(s:string[], schema:any): boolean[] {
   return s.map((ss) => { return decode_string_boolean_boolean_external(ss, schema); });
 }
-export function decode_string_array_object_object_external(s:string[], schema:any): object[] {
+export function decode_string_array_object_object_external(s:string[], schema:any): any[] {
   return s.map((ss) => { return decode_string_object_object_external(ss, schema); });
 }
