@@ -110,7 +110,9 @@ PRECIOUS: \
   $(TARGETS:%=$(TMPDIR)/%.ts) \
   $(TARGETS:%=$(DSTDIR)/%/swagger.yaml) \
   $(TARGETS:%=$(DSTDIR)/%/ts/index.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/swagger.d.ts) \
   $(TARGETS:%=$(DSTDIR)/%/ts/swagger.ts) \
+  $(TARGETS:%=$(DSTDIR)/%/ts/index.d.ts) \
   $(TARGETS:%=$(DSTDIR)/%/ts/codegen.ts) \
   $(TARGETS:%=$(DSTDIR)/%/ts/swagger.d.ts) \
   $(TARGETS:%=$(DSTDIR)/%/ts/tsconfig.json) \

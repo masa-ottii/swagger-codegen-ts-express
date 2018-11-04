@@ -30,6 +30,7 @@ paths:
   $ref#paths-methods: "./paths/methods.yaml"
   $ref#paths-parameters: "./paths/parameters.yaml"
   $ref#paths-responses: "./paths/responses.yaml"
+  $ref#paths-types-query: "./paths/types-query.yaml"
 #parameters:
 #  $ref#defs: "./params"
 definitions:

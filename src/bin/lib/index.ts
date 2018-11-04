@@ -21,12 +21,14 @@ class TypeGenerator {
   _schema_type:   string | undefined;
   _internal_type: string | undefined;
   _external_type: string | undefined;
+  _decoder: string | undefined;
   constructor(mode:any) {
     this._mode = mode;
     this._codes = [];
     this._schema_type   = undefined;
     this._internal_type = undefined;
     this._external_type = undefined;
+    this._decoder = undefined;
   }
   get schema_type(): string {
     return (this._schema_type === undefined)? 'undefined': this._schema_type;
@@ -36,6 +38,9 @@ class TypeGenerator {
   };
   get external_type(): string {
     return (this._external_type === undefined)? this.internal_type: this._external_type;
+  };
+  get decoder(): string {
+    return (this._decoder === undefined)? `${this.schema_type}_${this.internal_type}`: this._decoder;
   };
   get type(): string {
     return (this._mode.internal)? this.internal_type: this.external_type;
@@ -53,9 +58,10 @@ class TypeGenerator {
     return g;
   }
   on_definition(def: any) {
+    this._schema_type = undefined;
+    this._internal_type = 'undefined';
+    this._decoder = undefined;
     if (def === undefined) {
-      this._schema_type = undefined;
-      this._internal_type = 'undefined';
       return;
     }
     if (def.$ref !== undefined) {
@@ -99,6 +105,7 @@ class TypeGenerator {
       const subtype = TypeGenerator.walk(def.items, this._mode);
       this._schema_type = `array_${subtype.schema_type}`;
       this._internal_type = `${subtype.code}[]`;
+      this._decoder = `array_${subtype.schema_type}_${subtype.code}`;
     } else if (def.type === 'object') {
       if (def.properties === undefined) {
         this._schema_type = def.type;
@@ -199,13 +206,13 @@ class Generator {
     if (p.in === undefined) {
       throw new Error(`the 'in' field of Parameter is not defined: ${p.name}: ${position}`);
     } else if (p.in === 'query') {
-      ret.decoder = `decode_string_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
+      ret.decoder = `decode_string_${g.decoder.toLowerCase()}_external`;
       ret.container = `query.${p.name}`;
     } else if (p.in === 'header' || p.in === 'path') {
-      ret.decoder = `decode_string_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
+      ret.decoder = `decode_string_${g.decoder.toLowerCase()}_external`;
       ret.container = `params.${p.name}`;
     } else if (p.in === 'body') {
-      ret.decoder = `decode_json_${g.schema_type}_${g.internal_type.toLowerCase()}_external`;
+      ret.decoder = `decode_json_${g.decoder.toLowerCase()}_external`;
       ret.container = 'request.body';
     } else {
       throw new Error(`the 'in' field of Parameter is unknown: ${p.in}`);

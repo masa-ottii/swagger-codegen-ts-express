@@ -1,0 +1,95 @@
+  /types/query/integer:
+    get:
+      operationId: 'types_query_integer'
+      description: ''
+      parameters:
+        - name: integer
+          in: query
+          type: integer
+        - name: i32
+          in: query
+          type: integer
+          format: int32
+        - name: i64
+          in: query
+          type: integer
+          format: int64
+      responses:
+        'default':
+          description: 'default response'
+
+  /types/query/number:
+    get:
+      operationId: 'types_query_number'
+      description: ''
+      parameters:
+        - name: n
+          in: query
+          type: number
+        - name: f
+          in: query
+          type: number
+          format: float
+        - name: d
+          in: query
+          type: number
+          format: double
+      responses:
+        'default':
+          description: 'default response'
+
+  /types/query/string:
+    get:
+      operationId: 'types_query_string'
+      description: ''
+      parameters:
+        - name: s
+          in: query
+          type: string
+        - name: byte
+          in: query
+          type: string
+          format: byte
+        - name: binary
+          in: query
+          type: string
+          format: binary
+        - name: date
+          in: query
+          type: string
+          format: date
+        - name: datetime
+          in: query
+          type: string
+          format: date-time
+        - name: password
+          in: query
+          type: string
+          format: password
+      responses:
+        'default':
+          description: 'default response'
+  /types/query/boolean:
+    get:
+      operationId: 'types_query_boolean'
+      description: ''
+      parameters:
+        - name: b
+          in: query
+          type: boolean
+      responses:
+        'default':
+          description: 'default response'
+  /types/query/array:
+    post:
+      operationId: 'types_query_array'
+      description: ''
+      parameters:
+        - name: b
+          in: query
+          type: array
+          items:
+            type: integer
+      responses:
+        'default':
+          description: 'default response'
