@@ -118,7 +118,7 @@ class TypeGenerator {
         const subcodes = Object.keys(props).map((k) => {
           const p = props[k];
           const required =
-            ((props.required && props.required[k]) || (p.required))? '': '?';
+            ((def.required && (0 <= def.required.indexOf(k))) || (p.required))? '': '?';
           const t = TypeGenerator.walk(def.properties[k], this._mode);
           return(`${k}${required}: ${t.code}`);
         });

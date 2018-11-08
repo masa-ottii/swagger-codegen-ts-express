@@ -29,3 +29,17 @@
       responses:
         'default':
           description: 'default response'
+
+  /types/body/object-ref:
+    post:
+      operationId: 'types_body_object_ref'
+      description: ''
+      parameters:
+        - name: param
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/DefObj'
+      responses:
+        'default':
+          description: 'default response'
