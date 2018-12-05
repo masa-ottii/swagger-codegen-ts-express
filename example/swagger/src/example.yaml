@@ -47,3 +47,10 @@ definitions:
         type: integer
       b:
         type: string
+      c:
+        type: object
+        properties:
+          c1:
+            type: integer
+          c2:
+            type: integer

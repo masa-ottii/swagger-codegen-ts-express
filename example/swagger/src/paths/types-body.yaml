@@ -26,6 +26,14 @@
                 type: string
               bar:
                 type: integer
+              baz:
+                type: object
+                required: baz1
+                properties:
+                  baz1:
+                    type: integer
+                  baz2:
+                    type: integer
       responses:
         'default':
           description: 'default response'
