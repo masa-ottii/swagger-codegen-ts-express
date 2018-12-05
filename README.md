@@ -7,6 +7,13 @@ Generate TypeScript Koa2 server skeleton codes from swagger spec.
 $ node swagger-codegen-typescript-koa2 <input.swagger.yaml> <output.ts>
 ```
 
+and output.ts requires dtsgenerator@1.2.0 outputs.
+
+```console
+$ npx dtsgenerator@1.2.0 -n "" -o swagger.d.ts <input.swagger.yaml>
+```
+
+
 ## example
 
 ### input swagger file
@@ -111,6 +118,7 @@ export function setup(
   ...
 }
 ```
+
 
 ### server code
 
