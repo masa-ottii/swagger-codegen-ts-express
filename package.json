@@ -1,6 +1,6 @@
 {
   "name": "swagger-codegen-typescript-koa2",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Generate TypeScript Koa2 server skeleton codes from swagger spec.",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
