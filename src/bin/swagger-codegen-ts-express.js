@@ -3,7 +3,7 @@
 const swgen = require('./lib');
 
 function help() {
-  console.log('swagger-codegen-typescript-koa2.js <swagger> <output>')
+  console.log('swagger-codegen-ts-express.js <swagger> <output>')
 }
 
 function main() {

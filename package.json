@@ -1,15 +1,15 @@
 {
-  "name": "swagger-codegen-typescript-koa2",
+  "name": "swagger-codegen-ts-express",
   "version": "0.1.4",
   "description": "Generate TypeScript Koa2 server skeleton codes from swagger spec.",
   "main": "dist/lib/index.js",
   "types": "dist/lib/index.d.ts",
   "bin": {
-    "swagger-codegen-typescript-koa2": "dist/bin/swagger-codegen-typescript-koa2.js"
+    "swagger-codegen-ts-express": "dist/bin/swagger-codegen-ts-express.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dai1975/swagger-codegen-typescript-koa2"
+    "url": "git+https://github.com/dai1975/swagger-codegen-ts-express"
   },
   "keywords": [
     "swagger",
@@ -20,9 +20,9 @@
   "author": "Daisuke Kanda <dai1975@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dai1975/swagger-codegen-typescript-koa2/issues"
+    "url": "https://github.com/dai1975/swagger-codegen-ts-express/issues"
   },
-  "homepage": "https://github.com/dai1975/swagger-codegen-typescript-koa2#readme",
+  "homepage": "https://github.com/dai1975/swagger-codegen-ts-express#readme",
   "files": [
     "dist"
   ],

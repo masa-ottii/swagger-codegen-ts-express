@@ -42,8 +42,27 @@ paths:
             $ref: '#/definitions/ErrorResponse'
   /users:
     post:
-      summary: 'post user'
+      summary: 'ユーザー登録'
       operationId: 'post_users'
+      description: |
+        post user
+      parameters:
+        - in: body
+          name: user
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: ERR
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    put:
+      summary: 'ユーザー変更'
+      operationId: 'put_users'
       description: |
         post user
       parameters:

@@ -1,0 +1,48 @@
+// ---- {{& method.upper }} {{& path.raw }} -------------------
+export namespace {{& operationId }} {
+  export type Request = {
+    {{#parameters}}
+    {{& name }}{{^required}}?{{/required}}: {{& type_code }};
+    {{/parameters}}
+  }
+  export function make_request(ctx: KoaRouter.IRouterContext): Request {
+    return {
+      {{#parameters}}  {{& name }}: {{!
+      }}{{#required}}{{!
+        }}sctk.{{&decoder}}(ctx.{{& container }}!, {{& schema_code }}),{{!
+        }}{{/required}}{{^required}}{{!
+        }}(ctx.{{&container}})?{{!
+                           }}sctk.{{&decoder}}(ctx.{{& container }}!, {{& schema_code }}):{{!
+                           }}undefined,{{!
+        }}{{/required}}{{!
+      }}{{/parameters}}
+    };
+  }
+  {{#responses}}
+  export type Response{{& status.pascalcase }} = {{& type_code }};
+  {{/responses}}
+  export type Response = {
+    status: number;
+    body: {{& response_types_join }};
+  };
+  export interface Handler {
+    (req:Request, ctx:KoaRouter.IRouterContext): Promise<Response>;
+  };
+  export function route(router:Router) {
+    router.{{& method.lower }}('{{&path.basePath}}{{&path.koaPath}}', async (ctx_) => {
+      const ctx = <any>ctx_;  //KoaRouter.Router.IRouterContext;
+      const router = ctx.router as Router;
+      if (router.swagger.{{& operationId }}) {
+        const req = make_request(ctx);
+        const res = await router.swagger.{{& operationId }}!(req, ctx);
+        ctx.status = res.status;
+        ctx.body   = res.body;
+      } else {
+        ctx.status = 500;
+        ctx.body = {
+          details: 'not implemented yet'
+        };
+      }
+    });
+  }
+}

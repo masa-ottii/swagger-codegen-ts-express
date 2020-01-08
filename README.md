@@ -1,10 +1,10 @@
-# swagger-codegen-typescript-koa2
-Generate TypeScript Koa2 server skeleton codes from swagger spec.
+# swagger-codegen-ts-express
+Generate TypeScript Express server skeleton codes from swagger spec.
 
 ## usage
 
 ```console
-$ node swagger-codegen-typescript-koa2 <input.swagger.yaml> <output.ts>
+$ node swagger-codegen-ts-express <input.swagger.yaml> <output.ts>
 ```
 
 and output.ts requires dtsgenerator@1.2.0 outputs.
@@ -176,4 +176,4 @@ $ curl 'http://localhost:10080/simple-v1/users/string'
 ```
 
 ### more...
-If you see package.json or other settings, please check https://github.com/dai1975/swagger-codegen-typescript-koa2/tree/master/examle directory.
+If you see package.json or other settings, please check https://github.com/dai1975/swagger-codegen-ts-express/tree/master/examle directory.

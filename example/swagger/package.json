@@ -18,7 +18,7 @@
     "is-my-json-valid": "^2.19.0",
     "prettier": "^1.15.3",
     "redoc-cli": "^0.6.4",
-    "swagger-codegen-typescript-koa2": "^0.1.0",
+    "swagger-codegen-ts-express": "^0.1.0",
     "swagger-merger": "^1.4.3",
     "swagger2": "^1.0.4",
     "swagger2-koa": "^1.0.3",

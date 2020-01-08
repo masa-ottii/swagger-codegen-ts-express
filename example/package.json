@@ -1,5 +1,5 @@
 {
-  "name": "swagger-codegen-typescript-koa2-example",
+  "name": "swagger-codegen-ts-express-example",
   "version": "0.0.0",
   "description": "",
   "keywords": [
@@ -43,7 +43,7 @@
     "koa": "^2.6.1",
     "koa-bodyparser": "^4.2.1",
     "koa-cors": "0.0.16",
-    "swagger-codegen-typescript-koa2": "^0.1.0",
+    "swagger-codegen-ts-express": "^0.1.0",
     "tsconfig-paths": "^3.6.0",
     "typescript": "^3.1.3"
   }

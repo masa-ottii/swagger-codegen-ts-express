@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PKG=swagger-codegen-typescript-koa2
+PKG=swagger-codegen-ts-express
 
 PWD=$(dirname $0)
 BASEDIR=$PWD/../..
@@ -19,5 +19,5 @@ fi
 
 case $ENV in
   internal) echo -n $BASEDIR ;;
-  external) echo -n "./node_modules/swagger-codegen-typescript-koa2" ;;
+  external) echo -n "./node_modules/swagger-codegen-ts-express" ;;
 esac

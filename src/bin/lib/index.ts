@@ -12,6 +12,12 @@ interface CompiledOperation extends sw2_schema.Operation {
   resolvedParameters: sw2_schema.Parameter[];
 }
 
+interface PathItem {
+  method: string;
+  op: any;
+  cop: any;
+}
+
 class TypeGenerator {
   _mode: {
     internal: boolean,
@@ -129,6 +135,7 @@ class TypeGenerator {
 }
 
 
+
 class Generator {
   static METHODS: string[] = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
   static SWAGGER_DTS_NS = 'd';
@@ -162,23 +169,31 @@ class Generator {
       swagger_dts_ns: Generator.SWAGGER_DTS_NS,
     });
 
-    this.render('paths-header', {});
     this.results.operations = [];
     Object.keys(this.doc.paths).forEach(path => {
       debug('path=' + path);
+      let render_opts:any = {
+        raw: path,
+        basePath: this.doc.basePath,
+        koaPath: path.replace(/\{([a-zA-Z0-9_]+)\}/g, ':$1'),
+      };
       const path_item = this.doc.paths[path];
       const fullpath = this.doc.basePath ? this.doc.basePath + path : path;
       const cpath = this.compiled(fullpath);
       if (cpath == null) {
         throw new Error('cannot found compiled path: ' + fullpath);
       }
+      this.render('path-header', render_opts);
       this.on_path(path, path_item, cpath!);
+      this.render('path-footer', {});
     })
-    this.render('paths-footer', {});
     this.render('footer', {operations: this.results.operations});
   }
+
   on_path(path: string, item: sw2_schema.PathItem, cpath: sw2_compiler.CompiledPath) {
+  
     debug('on_path: ' + path);
+    let items:PathItem[] = [];
     Generator.METHODS.forEach(method => {
       const op = item[method];
       if (op != null) {
@@ -186,9 +201,10 @@ class Generator {
         if (cop == null) {
           throw new Error(`cannot found compiled operator: path=${path}, method=${method}`);
         }
-        this.on_operation(path, method, op, cop! as CompiledOperation);
+        items.push({method, op, cop});
       }
     });
+    this.on_operation(path, items);
   }
 
   parse_operation_parameter(p:sw2_schema.Parameter, position:string): object {
@@ -233,36 +249,43 @@ class Generator {
       }
     };
   }
-  on_operation(path: string, method: string, op: sw2_schema.Operation, cop: CompiledOperation) {
+  on_operation(path: string, items: PathItem[]) {
     //debug('resolved=' + JSON.stringify(cop.resolvedParameters));
-    let render_opts:any = {
-      method: {
-        lower: method.toLowerCase(),
-        upper: method.toUpperCase(),
-      },
-      path: {
-        raw: path,
-        basePath: this.doc.basePath,
-        koaPath: path.replace(/\{([a-zA-Z0-9_]+)\}/g, ':$1'),
-      },
-      operationId: cop.operationId!,
+    let render_opts = { 
+        pathItems: new Array<any>()
     };
 
-    const position=`path=${path}, method=${method}`;
-    render_opts.parameters = cop.resolvedParameters.map((p:sw2_schema.Parameter) => {
-      return this.parse_operation_parameter(p, position);
+    items.forEach(({method, op, cop})=>{
+      let item: any = {
+        summary: cop.summary,
+        method: {
+          lower: method.toLowerCase(),
+          upper: method.toUpperCase(),
+        },
+        operationId: cop.operationId!,
+      };
+  
+      const position=`path=${path}, method=${method}`;
+      item.parameters = cop.resolvedParameters.map((p:sw2_schema.Parameter) => {
+        return this.parse_operation_parameter(p, position);
+      });
+      item.responses = Object.keys(op.responses).map((status:string) => {
+        const res = op.responses[status];
+        return this.parse_operation_response(status, res, position);
+      });
+      item.response_types_join = item.responses.map((d:any) => {
+        return `Response${d.status.pascalcase}`;
+      }).join(' | ');
+
+      this.results.operations.push({
+        operationId: cop.operationId
+      });
+
+      render_opts.pathItems.push(item);
     });
-    render_opts.responses = Object.keys(op.responses).map((status:string) => {
-      const res = op.responses[status];
-      return this.parse_operation_response(status, res, position);
-    });
-    render_opts.response_types_join = render_opts.responses.map((d:any) => {
-      return `Response${d.status.pascalcase}`;
-    }).join(' | ');
+
     this.render('operation', render_opts);
-    this.results.operations.push({
-      operationId: cop.operationId
-    });
+
   }
 }
 

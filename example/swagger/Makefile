@@ -1,6 +1,6 @@
 TARGETS = example simple
 VALIDATOR = ./validate.js
-CODEGEN = $(shell /bin/bash detect-codegen-dir.sh)/dist/bin/swagger-codegen-typescript-koa2.js
+CODEGEN = $(shell /bin/bash detect-codegen-dir.sh)/dist/bin/swagger-codegen-ts-express.js
 SWAGGER_MERGER = node node_modules/swagger-merger/bin/swagger-merger.js
 PRETTIER = node node_modules/prettier/bin-prettier.js
 DTSGEN = npx dtsgenerator@1.2.0
