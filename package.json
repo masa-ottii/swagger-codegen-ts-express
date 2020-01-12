@@ -102,7 +102,7 @@
     "fs": "0.0.1-security",
     "lodash.upperfirst": "^4.3.1",
     "mustache": "^3.0.0",
-    "swagger2": "^1.0.1"
+    "swagger2": "^2.0.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.31",

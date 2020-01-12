@@ -179,10 +179,12 @@ class Generator {
       };
       const path_item = this.doc.paths[path];
       const fullpath = this.doc.basePath ? this.doc.basePath + path : path;
+
       const cpath = this.compiled(fullpath);
       if (cpath == null) {
         throw new Error('cannot found compiled path: ' + fullpath);
       }
+      
       this.render('path-header', render_opts);
       this.on_path(path, path_item, cpath!);
       this.render('path-footer', {});
@@ -292,9 +294,13 @@ class Generator {
 export function main(inpath: string, outpath: string) {
   const out = fs.createWriteStream(outpath, { flags: 'wx' });
 
-  const doc = sw2.loadDocumentSync(inpath);
+  const doc:any = sw2.loadDocumentSync(inpath);
   if (!sw2.validateDocument(doc)) {
     throw Error(`validation failed: ${inpath}`);
   }
-  Generator.generate(doc, out);
+  if(doc !== null){
+      Generator.generate(doc, out);
+  }else{
+    throw Error(`swagger document was unknown type: ${doc}`);
+  }
 }
